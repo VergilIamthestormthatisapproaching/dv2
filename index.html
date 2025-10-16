@@ -364,7 +364,7 @@
                         <div class="stat-label">Analyzed with Combined Data</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number">2.5× WHO</div>
+                        <div class="stat-number">6.7× WHO</div>
                         <div class="stat-label">Patna Exceeds Safe Limits</div>
                     </div>
                     <div class="stat-card">
@@ -591,17 +591,6 @@
     </div>
 
     <script type="text/javascript">
-        // Load data
-        const healthData = `City,State,Latitude,Longitude,PM2_5_Annual_Mean,PM10_Annual_Mean,ARI_Prevalence_%,Clean_Fuel_Use_%,Tobacco_Women_%,Tobacco_Men_%,Stunted_Children_%,Wasted_Children_%,Population_Category,Source_Citation_Count,Year,Country
-Bangalore,Karnataka,12.9716,77.5946,51.9,104.8,0.0,97.2,2.9,20.9,31.3,19.2,5-10M,5,2023,India
-Chennai,Tamil Nadu,13.0827,80.2707,46.7,95.2,1.0,97.7,0.7,8.9,20.4,18.3,5-10M,7,2023,India
-Hyderabad,Telangana,17.385,78.4867,55.3,118.6,0.8,99.5,1.7,12.4,30.4,17.7,5-10M,6,2023,India
-Jaipur,Rajasthan,26.9214,75.7873,71.3,156.8,0.6,60.1,6.3,33.1,25.0,14.6,1-5M,3,2023,India
-Kolkata,West Bengal,22.5726,88.3639,77.2,176.3,2.6,91.7,6.0,42.4,29.6,29.3,>10M,6,2023,India
-Patna,Bihar,25.5941,85.1376,101.4,225.6,0.7,64.6,2.1,39.9,34.5,27.5,1-5M,2,2023,India
-Pune,Maharashtra,18.5204,73.8567,49.8,102.1,3.3,89.5,11.7,27.9,30.7,31.4,5-10M,4,2023,India
-Visakhapatnam,Andhra Pradesh,17.6868,83.2185,41.2,84.6,2.0,72.9,6.3,22.8,31.0,21.5,1-5M,2,2023,India`;
-
         // MAP VISUALIZATION
         const mapSpec = {
             "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
@@ -626,7 +615,7 @@ Visakhapatnam,Andhra Pradesh,17.6868,83.2185,41.2,84.6,2.0,72.9,6.3,22.8,31.0,21
                 },
                 {
                     "data": {
-                        "values": healthData,
+                        "url": "data/combined_air_quality_health_data.csv",
                         "format": {"type": "csv"}
                     },
                     "mark": {
@@ -691,7 +680,7 @@ Visakhapatnam,Andhra Pradesh,17.6868,83.2185,41.2,84.6,2.0,72.9,6.3,22.8,31.0,21
             "width": 1200,
             "height": 500,
             "data": {
-                "values": healthData,
+                "url": "data/combined_air_quality_health_data.csv",
                 "format": {"type": "csv"}
             },
             "mark": {
@@ -750,7 +739,7 @@ Visakhapatnam,Andhra Pradesh,17.6868,83.2185,41.2,84.6,2.0,72.9,6.3,22.8,31.0,21
             "width": 1200,
             "height": 450,
             "data": {
-                "values": healthData,
+                "url": "data/combined_air_quality_health_data.csv",
                 "format": {"type": "csv"}
             },
             "transform": [
@@ -822,13 +811,13 @@ Visakhapatnam,Andhra Pradesh,17.6868,83.2185,41.2,84.6,2.0,72.9,6.3,22.8,31.0,21
             }
         };
 
-        // TIME SERIES (using sample data - you'll need to update with actual file)
+        // TIME SERIES
         const timeseriesSpec = {
             "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
             "width": 1200,
             "height": 500,
             "data": {
-                "url": "pm25_timeseries_data.csv",
+                "url": "data/pm25_timeseries_data.csv",
                 "format": {"type": "csv", "parse": {"Date": "date"}}
             },
             "params": [
@@ -939,7 +928,7 @@ Visakhapatnam,Andhra Pradesh,17.6868,83.2185,41.2,84.6,2.0,72.9,6.3,22.8,31.0,21
             "width": 1200,
             "height": 400,
             "data": {
-                "values": healthData,
+                "url": "data/combined_air_quality_health_data.csv",
                 "format": {"type": "csv"}
             },
             "transform": [
@@ -1003,7 +992,7 @@ Visakhapatnam,Andhra Pradesh,17.6868,83.2185,41.2,84.6,2.0,72.9,6.3,22.8,31.0,21
         vegaEmbed('#scatter', scatterSpec, {"actions": false});
         vegaEmbed('#barchart', barSpec, {"actions": false});
         vegaEmbed('#timeseries', timeseriesSpec, {"actions": false}).catch(err => {
-            document.getElementById('timeseries').innerHTML = '<p style="color: #e74c3c; padding: 40px; text-align: center;">Time series data file not found. Please ensure pm25_timeseries_data.csv is in the same directory.</p>';
+            document.getElementById('timeseries').innerHTML = '<p style="color: #e74c3c; padding: 40px; text-align: center;">Time series data file not found. Please ensure pm25_timeseries_data.csv is in the data/ directory.</p>';
         });
         vegaEmbed('#health_ranking', healthRankingSpec, {"actions": false});
     </script>
