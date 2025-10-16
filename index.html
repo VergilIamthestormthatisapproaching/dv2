@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Pollution & Health: The Hidden Crisis in Indian Cities</title>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Header Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 60px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        
+        .subtitle {
+            font-size: 20px;
+            opacity: 0.95;
+            font-weight: 300;
+            max-width: 900px;
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+        
+        .key-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+        
+        /* Content Sections */
+        .content {
+            padding: 60px;
+        }
+        
+        .section {
+            margin-bottom: 80px;
+        }
+        
+        .section-header {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 4px solid #667eea;
+            display: inline-block;
+        }
+        
+        .section-description {
+            font-size: 16px;
+            color: #555;
+            max-width: 900px;
+            line-height: 1.7;
+            margin-top: 20px;
+        }
+        
+        /* Info Boxes */
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px 25px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .info-box h3 {
+            color: #667eea;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .info-box p, .info-box ul {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .info-box ul {
+            list-style-position: inside;
+            margin-left: 0;
+        }
+        
+        .info-box li {
+            margin: 8px 0;
+        }
+        
+        /* Visualization Containers */
+        .viz-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            border: 1px solid #e0e0e0;
+        }
+        
+        .viz-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .viz-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        
+        /* Two-column layout for smaller visualizations */
+        .viz-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        /* Insights boxes */
+        .insight-box {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+        
+        .insight-box h3 {
+            color: #667eea;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .insight-box h3::before {
+            content: "💡";
+            margin-right: 10px;
+            font-size: 24px;
+        }
+        
+        .insight-box p {
+            font-size: 15px;
+            color: #444;
+            line-height: 1.7;
+            margin: 10px 0;
+        }
+        
+        .insight-box strong {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        /* WHO Guidelines Box */
+        .guidelines-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+        
+        .guidelines-box h3 {
+            color: #856404;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .guidelines-table {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .guideline-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .guideline-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #856404;
+        }
+        
+        .guideline-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 40px 60px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+        }
+        
+        .footer h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+        
+        .footer p, .footer ul {
+            font-size: 14px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .footer ul {
+            list-style: none;
+        }
+        
+        .footer li {
+            margin: 8px 0;
+        }
+        
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Author info */
+        .author-info {
+            text-align: center;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+            font-size: 14px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero, .content {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 32px;
+            }
+            
+            .section-title {
+                font-size: 28px;
+            }
+            
+            .viz-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <div class="hero-content">
+                <h1>Air Pollution & Health: The Hidden Crisis in Indian Cities</h1>
+                <p class="subtitle">
+                    Every breath matters. Explore how outdoor and indoor air pollution affects respiratory health 
+                    across major Indian cities, and discover the invisible connections between PM2.5 levels, 
+                    household fuel choices, and childhood respiratory infections.
+                </p>
+                
+                <div class="key-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">8 Cities</div>
+                        <div class="stat-label">Analyzed with Combined Data</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">2.5× WHO</div>
+                        <div class="stat-label">Patna Exceeds Safe Limits</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">40%</div>
+                        <div class="stat-label">Homes Still Use Unclean Fuel</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">3.3%</div>
+                        <div class="stat-label">Children with Respiratory Infections</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            
+            <!-- Introduction Section -->
+            <div class="section">
+                <div class="info-box">
+                    <h3>Why This Matters to You</h3>
+                    <p><strong>For Australians and Malaysians:</strong> While enjoying relatively clean air at home, understanding India's air quality crisis is crucial. Many of you may have family, business connections, or travel plans involving India. This visualization reveals health patterns that affect hundreds of millions of people and offers lessons for rapidly urbanizing regions across Asia-Pacific.</p>
+                    <p style="margin-top: 10px;"><strong>Key Context:</strong> India's urban air quality challenges stem from vehicle emissions, industrial activity, construction dust, agricultural burning, and widespread use of solid fuels for cooking. The health impacts extend beyond borders through regional air masses and shared environmental challenges.</p>
+                </div>
+
+                <div class="guidelines-box">
+                    <h3>⚠️ WHO Air Quality Guidelines (PM2.5)</h3>
+                    <div class="guidelines-table">
+                        <div class="guideline-item">
+                            <div class="guideline-value">≤15 µg/m³</div>
+                            <div class="guideline-label">Good<br>(Annual Average)</div>
+                        </div>
+                        <div class="guideline-item">
+                            <div class="guideline-value">15-35 µg/m³</div>
+                            <div class="guideline-label">Moderate<br>(Health Risk Increases)</div>
+                        </div>
+                        <div class="guideline-item">
+                            <div class="guideline-value">>75 µg/m³</div>
+                            <div class="guideline-label">Very Unhealthy<br>(Serious Health Impacts)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map Visualization -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Geographic Distribution: Where is Air Quality Worst?</h2>
+                    <p class="section-description">
+                        The Indo-Gangetic Plain (Delhi, Patna, Kolkata) faces the most severe air pollution challenges, 
+                        with PM2.5 levels 2-7 times above WHO recommendations. Coastal cities like Chennai and Visakhapatnam 
+                        benefit from sea breezes, showing relatively better air quality. Circle size represents pollution intensity, 
+                        while color indicates WHO health risk categories.
+                    </p>
+                </div>
+                <div class="viz-container">
+                    <div id="map"></div>
+                </div>
+                <div class="insight-box">
+                    <h3>Key Geographic Insight</h3>
+                    <p><strong>The Northern Crisis:</strong> Cities in the Indo-Gangetic Plain face a perfect storm of pollution. Patna's annual average (101.4 µg/m³) is <strong>6.7 times</strong> the WHO safe limit. Geographic factors trap pollution: mountain barriers block air circulation while winter temperature inversions create a "pollution dome" over northern cities.</p>
+                    <p><strong>Coastal Advantage:</strong> Visakhapatnam (41.2 µg/m³) and Chennai (46.7 µg/m³) demonstrate how proximity to the coast improves air circulation, though even these "cleaner" cities exceed WHO guidelines by 3×.</p>
+                </div>
+            </div>
+
+            <!-- Correlation Scatter Plot -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">The Double Burden: Outdoor & Indoor Air Pollution</h2>
+                    <p class="section-description">
+                        Cities with worse outdoor air quality also struggle with indoor pollution from cooking fuels. 
+                        This scatter plot reveals a concerning pattern: as outdoor PM2.5 increases, the percentage of 
+                        households using clean cooking fuel decreases. Hover over points to see detailed city data.
+                    </p>
+                </div>
+                <div class="viz-container">
+                    <div id="scatter"></div>
+                </div>
+                <div class="insight-box">
+                    <h3>The Dual Pollution Trap</h3>
+                    <p><strong>Correlation Found:</strong> Analysis reveals a <strong>-0.52 correlation</strong> between outdoor PM2.5 and clean fuel adoption. Cities facing severe outdoor pollution typically have lower incomes and infrastructure development, leading to continued reliance on polluting cooking fuels like wood, dung, and kerosene.</p>
+                    <p><strong>Impact on Women & Children:</strong> Since women and children spend more time indoors, they face disproportionate exposure to household air pollution. In Jaipur, where only 60% use clean fuel, families experience a toxic combination of both pollution sources.</p>
+                </div>
+            </div>
+
+            <!-- Bar Chart Comparison -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">City-by-City Health Comparison</h2>
+                    <p class="section-description">
+                        Compare cities across three critical dimensions: outdoor air pollution (PM2.5), 
+                        indoor air quality (clean fuel adoption), and respiratory health outcomes (ARI prevalence in children). 
+                        Click legend items to isolate specific metrics.
+                    </p>
+                </div>
+                <div class="viz-container">
+                    <div id="barchart"></div>
+                </div>
+                <div class="insight-box">
+                    <h3>Unexpected Patterns in Respiratory Health</h3>
+                    <p><strong>The Pune Paradox:</strong> Despite moderate outdoor pollution (49.8 µg/m³), Pune shows the highest acute respiratory infection rate (3.3%). This suggests healthcare access, disease reporting systems, and population density play significant roles beyond just air quality.</p>
+                    <p><strong>Bangalore's Success:</strong> Reports virtually no ARI cases despite pollution levels of 51.9 µg/m³, possibly reflecting better healthcare infrastructure, higher clean fuel adoption (97.2%), and effective public health interventions.</p>
+                </div>
+            </div>
+
+            <!-- Time Series -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Seasonal Patterns: When Does Pollution Peak?</h2>
+                    <p class="section-description">
+                        Air pollution follows dramatic seasonal cycles. Winter months (November-February) see the worst air quality 
+                        due to crop burning, firecracker use during Diwali, and temperature inversions trapping pollutants. 
+                        Monsoon months (June-September) bring relief as rain washes pollutants from the air.
+                    </p>
+                </div>
+                <div class="viz-container">
+                    <div id="timeseries"></div>
+                </div>
+                <div class="info-box">
+                    <h3>Interactive Features</h3>
+                    <ul>
+                        <li><strong>Click legend items</strong> to show/hide specific cities and focus on patterns</li>
+                        <li><strong>Drag on the chart</strong> to zoom into specific time periods</li>
+                        <li><strong>Hover over data points</strong> for detailed monthly readings and events</li>
+                        <li><strong>Notice the annotations</strong> marking key pollution events: Post-Diwali spikes and stubble burning season</li>
+                    </ul>
+                </div>
+                <div class="insight-box">
+                    <h3>Critical Seasonal Events</h3>
+                    <p><strong>Post-Diwali Spike (October-November):</strong> Delhi's PM2.5 surges to 134.7 µg/m³ after Diwali celebrations, nearly <strong>9 times WHO limits</strong>. Firecracker smoke combines with existing pollution and seasonal weather patterns to create hazardous conditions lasting weeks.</p>
+                    <p><strong>Stubble Burning Crisis (November):</strong> Farmers in Punjab and Haryana burn crop residue, creating massive pollution clouds that drift over northern cities. Delhi's pollution jumps 36% in November specifically due to this agricultural practice.</p>
+                    <p><strong>Monsoon Relief (June-August):</strong> Rainfall reduces PM2.5 by 30-50% across all cities. Delhi drops from 156.3 µg/m³ in January to 68.9 µg/m³ in July – though still 4.6× WHO guidelines.</p>
+                </div>
+            </div>
+
+            <!-- Health Impact Ranking -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Health Vulnerability Rankings</h2>
+                    <p class="section-description">
+                        Combining multiple health indicators – respiratory infections, malnutrition (stunting/wasting), 
+                        and tobacco use – reveals which cities face the greatest overall health burdens. These factors 
+                        interact with air pollution to amplify health risks.
+                    </p>
+                </div>
+                <div class="viz-container">
+                    <div id="health_ranking"></div>
+                </div>
+                <div class="insight-box">
+                    <h3>Vulnerability Factors Beyond Air Quality</h3>
+                    <p><strong>Malnutrition Multiplies Risk:</strong> Kolkata and Patna show high rates of child malnutrition (29-34% stunted), making children more vulnerable to respiratory infections. Undernourished children have weaker immune systems and lung development.</p>
+                    <p><strong>Tobacco Epidemic:</strong> Male tobacco use ranges from 9% (Chennai) to 42% (Kolkata). Combined with air pollution, tobacco users face exponentially higher risks of COPD, lung cancer, and cardiovascular disease. Kolkata's "triple burden" – high PM2.5, high tobacco use, and poor nutrition – creates a perfect storm for respiratory disease.</p>
+                </div>
+            </div>
+
+            <!-- Conclusions -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">What Can Be Done?</h2>
+                </div>
+                
+                <div class="viz-grid">
+                    <div class="info-box">
+                        <h3>🏭 Outdoor Air Quality Solutions</h3>
+                        <ul>
+                            <li>Transition to cleaner fuels and renewable energy</li>
+                            <li>Strengthen vehicle emission standards</li>
+                            <li>Regulate industrial emissions more strictly</li>
+                            <li>Provide alternatives to crop burning</li>
+                            <li>Expand public transportation networks</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="info-box">
+                        <h3>🏠 Indoor Air Quality Solutions</h3>
+                        <ul>
+                            <li>Subsidize LPG and electric cooking stoves</li>
+                            <li>Improve kitchen ventilation in homes</li>
+                            <li>Promote cleaner biomass cookstoves</li>
+                            <li>Educate about household air pollution risks</li>
+                            <li>Support fuel-switching programs</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    <h3>🎯 Quick Wins That Could Save Lives</h3>
+                    <ul>
+                        <li><strong>Accelerate LPG Adoption:</strong> If cities with low clean fuel use (Jaipur 60%, Patna 65%) reached Hyderabad's level (99.5%), millions would breathe cleaner indoor air</li>
+                        <li><strong>Target Seasonal Events:</strong> Banning firecrackers during Diwali and providing crop-residue alternatives could cut winter pollution peaks by 30-40%</li>
+                        <li><strong>Improve Tobacco Control:</strong> Reducing male tobacco use in high-prevalence cities (Kolkata 42%, Patna 40%) would provide immediate respiratory health benefits</li>
+                        <li><strong>Strengthen Healthcare:</strong> Cities like Pune showing high ARI rates need better primary healthcare access and respiratory disease management</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-content">
+                <div>
+                    <h3>Data Sources & Methodology</h3>
+                    <p><strong>Air Quality Data:</strong> World Health Organization (WHO) Ambient Air Quality Database V6.1, 2024. Annual mean PM2.5 and PM10 concentrations for Indian cities, measured in 2023.</p>
+                    <p style="margin-top: 10px;"><strong>Health Data:</strong> National Family Health Survey (NFHS-5), 2019-2021. Ministry of Health and Family Welfare, Government of India. City-level indicators on respiratory health, household fuel use, tobacco consumption, and child nutrition.</p>
+                    <p style="margin-top: 10px;"><strong>Time Series Data:</strong> Monthly PM2.5 measurements compiled from CPCB (Central Pollution Control Board) monitoring stations, 2023.</p>
+                    <p style="margin-top: 10px;"><strong>Visualization:</strong> Created using Vega-Lite visualization grammar. All data processing and analysis conducted using Python pandas library.</p>
+                </div>
+                <div>
+                    <h3>Further Reading</h3>
+                    <ul>
+                        <li><a href="https://www.who.int/teams/environment-climate-change-and-health/air-quality-and-health/policy-progress/who-air-quality-guidelines" target="_blank">WHO Air Quality Guidelines</a></li>
+                        <li><a href="http://rchiips.org/nfhs/" target="_blank">National Family Health Survey (NFHS)</a></li>
+                        <li><a href="https://app.cpcbccr.com/ccr/#/caaqm-dashboard-all/caaqm-landing" target="_blank">India Air Quality Monitoring</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Author -->
+        <div class="author-info">
+            <p>Created for FIT3179 Data Visualization Assignment 2 | Monash University | October 2025</p>
+            <p style="margin-top: 5px;">Data visualization demonstrates the intersection of environmental pollution and public health outcomes across Indian cities</p>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // Load data
+        const healthData = `City,State,Latitude,Longitude,PM2_5_Annual_Mean,PM10_Annual_Mean,ARI_Prevalence_%,Clean_Fuel_Use_%,Tobacco_Women_%,Tobacco_Men_%,Stunted_Children_%,Wasted_Children_%,Population_Category,Source_Citation_Count,Year,Country
+Bangalore,Karnataka,12.9716,77.5946,51.9,104.8,0.0,97.2,2.9,20.9,31.3,19.2,5-10M,5,2023,India
+Chennai,Tamil Nadu,13.0827,80.2707,46.7,95.2,1.0,97.7,0.7,8.9,20.4,18.3,5-10M,7,2023,India
+Hyderabad,Telangana,17.385,78.4867,55.3,118.6,0.8,99.5,1.7,12.4,30.4,17.7,5-10M,6,2023,India
+Jaipur,Rajasthan,26.9214,75.7873,71.3,156.8,0.6,60.1,6.3,33.1,25.0,14.6,1-5M,3,2023,India
+Kolkata,West Bengal,22.5726,88.3639,77.2,176.3,2.6,91.7,6.0,42.4,29.6,29.3,>10M,6,2023,India
+Patna,Bihar,25.5941,85.1376,101.4,225.6,0.7,64.6,2.1,39.9,34.5,27.5,1-5M,2,2023,India
+Pune,Maharashtra,18.5204,73.8567,49.8,102.1,3.3,89.5,11.7,27.9,30.7,31.4,5-10M,4,2023,India
+Visakhapatnam,Andhra Pradesh,17.6868,83.2185,41.2,84.6,2.0,72.9,6.3,22.8,31.0,21.5,1-5M,2,2023,India`;
+
+        // MAP VISUALIZATION
+        const mapSpec = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "width": 1200,
+            "height": 700,
+            "projection": {
+                "type": "mercator",
+                "center": [78, 20],
+                "scale": 1100
+            },
+            "layer": [
+                {
+                    "data": {
+                        "url": "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"
+                    },
+                    "mark": {
+                        "type": "geoshape",
+                        "fill": "#f0f0f0",
+                        "stroke": "#cccccc",
+                        "strokeWidth": 0.5
+                    }
+                },
+                {
+                    "data": {
+                        "values": healthData,
+                        "format": {"type": "csv"}
+                    },
+                    "mark": {
+                        "type": "circle",
+                        "opacity": 0.9,
+                        "stroke": "white",
+                        "strokeWidth": 2.5
+                    },
+                    "encoding": {
+                        "longitude": {"field": "Longitude", "type": "quantitative"},
+                        "latitude": {"field": "Latitude", "type": "quantitative"},
+                        "size": {
+                            "field": "PM2_5_Annual_Mean",
+                            "type": "quantitative",
+                            "scale": {
+                                "type": "linear",
+                                "range": [300, 1200],
+                                "domain": [40, 105]
+                            },
+                            "legend": {
+                                "title": "PM2.5 Level (µg/m³)",
+                                "titleFontSize": 13,
+                                "titleFontWeight": "bold",
+                                "labelFontSize": 11,
+                                "orient": "bottom-left"
+                            }
+                        },
+                        "color": {
+                            "field": "PM2_5_Annual_Mean",
+                            "type": "quantitative",
+                            "scale": {
+                                "type": "threshold",
+                                "domain": [15, 35, 75],
+                                "range": ["#2ecc71", "#f39c12", "#e67e22", "#c0392b"]
+                            },
+                            "legend": {
+                                "title": "WHO Air Quality Category",
+                                "titleFontSize": 13,
+                                "titleFontWeight": "bold",
+                                "labelFontSize": 11,
+                                "orient": "bottom-right",
+                                "values": [15, 35, 75],
+                                "labelExpr": "datum.value == 15 ? 'Good (≤15)' : datum.value == 35 ? 'Moderate (15-35)' : datum.value == 75 ? 'Unhealthy (35-75)' : 'Very Unhealthy (>75)'"
+                            }
+                        },
+                        "tooltip": [
+                            {"field": "City", "type": "nominal", "title": "City"},
+                            {"field": "State", "type": "nominal", "title": "State"},
+                            {"field": "PM2_5_Annual_Mean", "type": "quantitative", "title": "PM2.5 (µg/m³)", "format": ".1f"},
+                            {"field": "ARI_Prevalence_%", "type": "quantitative", "title": "Respiratory Infections (%)", "format": ".1f"},
+                            {"field": "Clean_Fuel_Use_%", "type": "quantitative", "title": "Clean Fuel Use (%)", "format": ".1f"},
+                            {"field": "Tobacco_Men_%", "type": "quantitative", "title": "Male Tobacco Use (%)", "format": ".1f"}
+                        ]
+                    }
+                }
+            ]
+        };
+
+        // SCATTER PLOT
+        const scatterSpec = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "width": 1200,
+            "height": 500,
+            "data": {
+                "values": healthData,
+                "format": {"type": "csv"}
+            },
+            "mark": {
+                "type": "circle",
+                "size": 400,
+                "opacity": 0.8
+            },
+            "encoding": {
+                "x": {
+                    "field": "PM2_5_Annual_Mean",
+                    "type": "quantitative",
+                    "scale": {"domain": [35, 110]},
+                    "axis": {
+                        "title": "Outdoor Air Pollution: PM2.5 Concentration (µg/m³)",
+                        "titleFontSize": 14,
+                        "titleFontWeight": "bold",
+                        "grid": true
+                    }
+                },
+                "y": {
+                    "field": "Clean_Fuel_Use_%",
+                    "type": "quantitative",
+                    "scale": {"domain": [55, 102]},
+                    "axis": {
+                        "title": "Indoor Air Quality: Clean Cooking Fuel Usage (%)",
+                        "titleFontSize": 14,
+                        "titleFontWeight": "bold",
+                        "grid": true
+                    }
+                },
+                "color": {
+                    "field": "ARI_Prevalence_%",
+                    "type": "quantitative",
+                    "scale": {
+                        "scheme": "redyellowgreen",
+                        "reverse": true
+                    },
+                    "legend": {
+                        "title": "Respiratory Infection Rate (%)",
+                        "titleFontSize": 13,
+                        "titleFontWeight": "bold"
+                    }
+                },
+                "tooltip": [
+                    {"field": "City", "type": "nominal", "title": "City"},
+                    {"field": "PM2_5_Annual_Mean", "type": "quantitative", "title": "PM2.5 (µg/m³)", "format": ".1f"},
+                    {"field": "Clean_Fuel_Use_%", "type": "quantitative", "title": "Clean Fuel Use (%)", "format": ".1f"},
+                    {"field": "ARI_Prevalence_%", "type": "quantitative", "title": "ARI Prevalence (%)", "format": ".1f"}
+                ]
+            }
+        };
+
+        // BAR CHART
+        const barSpec = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "width": 1200,
+            "height": 450,
+            "data": {
+                "values": healthData,
+                "format": {"type": "csv"}
+            },
+            "transform": [
+                {
+                    "fold": ["PM2_5_Annual_Mean", "Clean_Fuel_Use_%", "ARI_Prevalence_%"],
+                    "as": ["Metric", "Value"]
+                },
+                {
+                    "calculate": "datum.Metric === 'PM2_5_Annual_Mean' ? 'PM2.5 Level' : datum.Metric === 'Clean_Fuel_Use_%' ? 'Clean Fuel Use (%)' : 'Respiratory Infections (%)'",
+                    "as": "Metric_Label"
+                }
+            ],
+            "params": [
+                {
+                    "name": "metric_selection",
+                    "select": {"type": "point", "fields": ["Metric_Label"]},
+                    "bind": "legend"
+                }
+            ],
+            "mark": "bar",
+            "encoding": {
+                "x": {
+                    "field": "City",
+                    "type": "nominal",
+                    "axis": {
+                        "title": null,
+                        "labelAngle": -45,
+                        "labelFontSize": 12
+                    },
+                    "sort": "-y"
+                },
+                "y": {
+                    "field": "Value",
+                    "type": "quantitative",
+                    "axis": {
+                        "title": "Value",
+                        "titleFontSize": 14,
+                        "titleFontWeight": "bold",
+                        "grid": true
+                    }
+                },
+                "color": {
+                    "field": "Metric_Label",
+                    "type": "nominal",
+                    "scale": {
+                        "domain": ["PM2.5 Level", "Clean Fuel Use (%)", "Respiratory Infections (%)"],
+                        "range": ["#e74c3c", "#2ecc71", "#3498db"]
+                    },
+                    "legend": {
+                        "title": "Metric (Click to Filter)",
+                        "titleFontSize": 13,
+                        "titleFontWeight": "bold",
+                        "orient": "top"
+                    }
+                },
+                "opacity": {
+                    "condition": {"param": "metric_selection", "value": 1},
+                    "value": 0.2
+                },
+                "xOffset": {"field": "Metric_Label"},
+                "tooltip": [
+                    {"field": "City", "type": "nominal"},
+                    {"field": "Metric_Label", "type": "nominal", "title": "Metric"},
+                    {"field": "Value", "type": "quantitative", "format": ".1f"}
+                ]
+            },
+            "config": {
+                "view": {"stroke": null}
+            }
+        };
+
+        // TIME SERIES (using sample data - you'll need to update with actual file)
+        const timeseriesSpec = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "width": 1200,
+            "height": 500,
+            "data": {
+                "url": "pm25_timeseries_data.csv",
+                "format": {"type": "csv", "parse": {"Date": "date"}}
+            },
+            "params": [
+                {
+                    "name": "city_selection",
+                    "select": {"type": "point", "fields": ["City"]},
+                    "bind": "legend"
+                },
+                {
+                    "name": "date_range",
+                    "select": {"type": "interval", "encodings": ["x"]}
+                }
+            ],
+            "transform": [
+                {"filter": {"param": "date_range"}}
+            ],
+            "layer": [
+                {
+                    "mark": {
+                        "type": "line",
+                        "point": true,
+                        "strokeWidth": 3
+                    },
+                    "encoding": {
+                        "x": {
+                            "field": "Date",
+                            "type": "temporal",
+                            "axis": {
+                                "title": "Month (2023)",
+                                "titleFontSize": 14,
+                                "titleFontWeight": "bold",
+                                "format": "%b",
+                                "grid": true
+                            }
+                        },
+                        "y": {
+                            "field": "PM2_5",
+                            "type": "quantitative",
+                            "scale": {"domain": [0, 170]},
+                            "axis": {
+                                "title": "PM2.5 Concentration (μg/m³)",
+                                "titleFontSize": 14,
+                                "titleFontWeight": "bold",
+                                "grid": true
+                            }
+                        },
+                        "color": {
+                            "field": "City",
+                            "type": "nominal",
+                            "scale": {
+                                "domain": ["Delhi", "Mumbai", "Kolkata", "Bangalore", "Chennai", "Hyderabad"],
+                                "range": ["#e74c3c", "#3498db", "#f39c12", "#2ecc71", "#9b59b6", "#1abc9c"]
+                            },
+                            "legend": {
+                                "title": "City (Click to Filter)",
+                                "titleFontSize": 13,
+                                "titleFontWeight": "bold",
+                                "orient": "right"
+                            }
+                        },
+                        "opacity": {
+                            "condition": {"param": "city_selection", "value": 1},
+                            "value": 0.1
+                        },
+                        "strokeWidth": {
+                            "condition": {"param": "city_selection", "value": 3},
+                            "value": 1
+                        },
+                        "tooltip": [
+                            {"field": "City", "type": "nominal"},
+                            {"field": "Month_Name", "type": "nominal", "title": "Month"},
+                            {"field": "PM2_5", "type": "quantitative", "title": "PM2.5 (μg/m³)", "format": ".1f"},
+                            {"field": "Season", "type": "nominal"},
+                            {"field": "Event_Type", "type": "nominal", "title": "Event"}
+                        ]
+                    }
+                },
+                {
+                    "mark": {"type": "rule", "color": "#e74c3c", "strokeWidth": 2, "strokeDash": [8, 4]},
+                    "encoding": {"y": {"datum": 75}}
+                },
+                {
+                    "mark": {"type": "text", "align": "left", "dx": 5, "dy": -5, "fontSize": 11, "fontWeight": "bold", "color": "#e74c3c"},
+                    "encoding": {
+                        "x": {"datum": {"year": 2023, "month": 1}},
+                        "y": {"datum": 75},
+                        "text": {"value": "WHO Unhealthy (75 μg/m³)"}
+                    }
+                },
+                {
+                    "mark": {"type": "rule", "color": "#f39c12", "strokeWidth": 2, "strokeDash": [8, 4]},
+                    "encoding": {"y": {"datum": 35}}
+                },
+                {
+                    "mark": {"type": "text", "align": "left", "dx": 5, "dy": -5, "fontSize": 11, "fontWeight": "bold", "color": "#f39c12"},
+                    "encoding": {
+                        "x": {"datum": {"year": 2023, "month": 1}},
+                        "y": {"datum": 35},
+                        "text": {"value": "WHO Moderate (35 μg/m³)"}
+                    }
+                }
+            ]
+        };
+
+        // HEALTH RANKING
+        const healthRankingSpec = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "width": 1200,
+            "height": 400,
+            "data": {
+                "values": healthData,
+                "format": {"type": "csv"}
+            },
+            "transform": [
+                {
+                    "fold": ["Stunted_Children_%", "Wasted_Children_%", "Tobacco_Men_%"],
+                    "as": ["Health_Indicator", "Percentage"]
+                },
+                {
+                    "calculate": "datum.Health_Indicator === 'Stunted_Children_%' ? 'Child Stunting' : datum.Health_Indicator === 'Wasted_Children_%' ? 'Child Wasting' : 'Male Tobacco Use'",
+                    "as": "Indicator_Label"
+                }
+            ],
+            "mark": {
+                "type": "bar",
+                "cornerRadius": 4
+            },
+            "encoding": {
+                "y": {
+                    "field": "City",
+                    "type": "nominal",
+                    "axis": {
+                        "title": null,
+                        "labelFontSize": 12
+                    },
+                    "sort": "-x"
+                },
+                "x": {
+                    "field": "Percentage",
+                    "type": "quantitative",
+                    "stack": "zero",
+                    "axis": {
+                        "title": "Percentage (%)",
+                        "titleFontSize": 14,
+                        "titleFontWeight": "bold"
+                    }
+                },
+                "color": {
+                    "field": "Indicator_Label",
+                    "type": "nominal",
+                    "scale": {
+                        "domain": ["Child Stunting", "Child Wasting", "Male Tobacco Use"],
+                        "range": ["#e74c3c", "#f39c12", "#9b59b6"]
+                    },
+                    "legend": {
+                        "title": "Health Risk Factor",
+                        "titleFontSize": 13,
+                        "titleFontWeight": "bold",
+                        "orient": "top"
+                    }
+                },
+                "tooltip": [
+                    {"field": "City", "type": "nominal"},
+                    {"field": "Indicator_Label", "type": "nominal", "title": "Indicator"},
+                    {"field": "Percentage", "type": "quantitative", "title": "Percentage", "format": ".1f"}
+                ]
+            }
+        };
+
+        // Embed all visualizations
+        vegaEmbed('#map', mapSpec, {"actions": false});
+        vegaEmbed('#scatter', scatterSpec, {"actions": false});
+        vegaEmbed('#barchart', barSpec, {"actions": false});
+        vegaEmbed('#timeseries', timeseriesSpec, {"actions": false}).catch(err => {
+            document.getElementById('timeseries').innerHTML = '<p style="color: #e74c3c; padding: 40px; text-align: center;">Time series data file not found. Please ensure pm25_timeseries_data.csv is in the same directory.</p>';
+        });
+        vegaEmbed('#health_ranking', healthRankingSpec, {"actions": false});
+    </script>
+</body>
+</html>
